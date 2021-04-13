@@ -9,6 +9,7 @@ function add_custom_discount_2nd_at_50( $wc_cart ){
     $discount = 0;
     $items_prices = array();
     $a=0;
+    $cat_in_cart=false;
 
     // Set HERE your targeted variable product ID
     $targeted_product_id = "834"; //producto targeted
@@ -16,7 +17,7 @@ function add_custom_discount_2nd_at_50( $wc_cart ){
 foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
 
     // If Cart has category "accesorios", set $cat_in_cart to true
-    if ( has_term( 'accesorios', 'product_cat', $cart_item['product_id'] ) ) {
+    if ( has_term( 'rebajas', 'product_cat', $cart_item['product_id'] ) or has_term( 'accesorios', 'product_cat', $cart_item['product_id'] ) ) {
         $cat_in_cart = true;
         break;
     }
@@ -33,7 +34,7 @@ foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
          if( $count_items_prices > 1 ){                                                 // si hay algun elemento en el arreglo (osea > 1)
            foreach( $items_prices as $key => $price ) {                                   // $items_prices en el for each
                $a++;                                                                     //contador para cada itereacion
-               if ($a == 2) {                                                            // evalua si es la segunda iteracion
+               if ($a == 2) {                                                           // evalua si es la segunda iteracion
                  $discount -= number_format($price / 2, 2 );                             //si es la segunda itereacion que divida el precio entre 2 y que le de formato de dos decimales
                  break;                                                                  // que haga el break
                }
@@ -46,20 +47,26 @@ foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
 if ( $cat_in_cart ) {
 
 // For example, print a notice
-wc_print_notice( 'Category Downloads is in the Cart!', 'notice' );
+wc_print_notice( 'Los accesorios no son validos para el segundo productos a %50 de descuento.', 'notice' );
 
 // Or maybe run your own function...
 // ..........
 }
 
 
-    if( $discount != 0 ){
+    if( $discount != 0){
         // Displaying a custom notice (optional)
+        if ( $cat_in_cart== false ) {
+
         wc_clear_notices();
         wc_add_notice( __("You get 50% of discount on the 2nd item"), 'notice');
 
+		}
+
         // The discount
+        if ( $cat_in_cart== false ) {
         $wc_cart->add_fee( 'Discount 2nd at 50%', $discount, true  );
+      }
         # Note: Last argument in add_fee() method is related to applying the tax or not to the discount (true or false)
     }
 }
